@@ -8,10 +8,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TelegramAuthApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load();
-		dotenv.entries().forEach(entry -> {
-			System.setProperty(entry.getKey(), entry.getValue());
-		});
+		Dotenv dotenv = Dotenv.configure()
+				.ignoreIfMissing()
+				.load();
+
+		String botToken = System.getenv("BOT_TOKEN");
+		if (botToken == null) {
+			botToken = dotenv.get("BOT_TOKEN");
+		}
+
+		if (botToken == null) {
+			throw new RuntimeException("BOT_TOKEN is not set in environment variables or .env file");
+		}
 
 		SpringApplication.run(TelegramAuthApplication.class, args);
 	}
